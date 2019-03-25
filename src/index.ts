@@ -1,19 +1,17 @@
 import { ApplicationConfig } from '@loopback/core';
 import { CloudFoundryMonitorApplication } from './application';
 
-const {PORT, USER_API, PROJECTS_API, JOBS_API, AMQP_URL, AMQP_PORT, AMQP_USER, AMQP_PWD, JOB_ID, NODE_ID, NODE_NAME, URI, TOTAL_SIMULATED_USERS, RUN_TIME} = process.env;
+const {PORT, USER_API, PROJECTS_API, JOBS_API, AMQP_URL, AMQP_PORT, AMQP_USER, AMQP_PWD, JOB_ID, CF_API, CF_USER, CF_PASS} = process.env;
 
 export async function main(options: ApplicationConfig = {}): Promise<CloudFoundryMonitorApplication> {
     options.port = options.port || PORT;
     options.config = {
-        jobId: JOB_ID,
-        name: NODE_NAME,
-        nodeId: NODE_ID
+        jobId: JOB_ID
     };
-    options.task = {
-        uri: URI,
-        totalSimulatedUsers: TOTAL_SIMULATED_USERS,
-        runTime: RUN_TIME
+    options.cf = {
+        api: CF_API,
+        user: CF_USER,
+        pass: CF_PASS
     };
     options.apis = {
         userApi: USER_API,

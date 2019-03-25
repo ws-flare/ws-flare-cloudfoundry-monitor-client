@@ -2,6 +2,7 @@ import { Application, CoreBindings } from '@loopback/core';
 import { Context, inject } from '@loopback/context';
 import { Connection } from 'amqplib';
 import { Logger } from 'winston';
+import { AuthService } from './services/auth.service';
 
 export class Server extends Context implements Server {
     private _listening: boolean = false;
@@ -21,6 +22,9 @@ export class Server extends Context implements Server {
     @inject('queue.node.ready')
     private nodeReadyQueue: string;
 
+    @inject('services.auth')
+    private authService: AuthService;
+
     constructor(@inject(CoreBindings.APPLICATION_INSTANCE) public app?: Application) {
         super(app);
     }
@@ -31,7 +35,6 @@ export class Server extends Context implements Server {
 
     async start(): Promise<void> {
         const createJobChannel = await this.amqpConn.createChannel();
-        const nodeReadyChannel = await this.amqpConn.createChannel();
 
         const queue = `${this.startTestQueue}.${this.jobId}`;
 
@@ -41,9 +44,9 @@ export class Server extends Context implements Server {
 
         await createJobChannel.bindQueue(qok.queue, queue, '');
 
-        await nodeReadyChannel.assertQueue(this.nodeReadyQueue);
-
-        await nodeReadyChannel.sendToQueue(this.nodeReadyQueue, new Buffer((JSON.stringify({ready: true}))));
+        await createJobChannel.consume(qok.queue, async () => {
+            const token = await this.authService.login();
+        }, {noAck: true});
     }
 
     async stop(): Promise<void> {

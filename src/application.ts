@@ -3,6 +3,9 @@ import { Client1_10, config } from 'kubernetes-client';
 import { connect } from 'amqplib';
 import { Server } from './server';
 import { createLogger, transports } from 'winston';
+import { CfControllerService } from './services/cloud-foundry/cf-controller.service';
+import { AuthService } from './services/auth.service';
+import { CfAuthService } from './services/cloud-foundry/cf-auth.service';
 
 export class CloudFoundryMonitorApplication extends Application {
 
@@ -23,15 +26,12 @@ export class CloudFoundryMonitorApplication extends Application {
         this.bind('logger').to(logger);
 
         // Config
-        this.bind('config.nodes.connectionLimitPerNode').to(1000);
         this.bind('config.job.id').to(options.config.jobId);
-        this.bind('config.name').to(options.config.name);
-        this.bind('config.nodeId').to(options.config.nodeId);
 
-        // Task
-        this.bind('task.uri').to(options.task.uri);
-        this.bind('task.totalSimulatedUsers').to(options.task.totalSimulatedUsers);
-        this.bind('task.runTime').to(options.task.runTime * 1000);
+        // CF
+        this.bind('cf.api').to(options.cf.api);
+        this.bind('cf.user').to(options.cf.user);
+        this.bind('cf.pass').to(options.cf.pass);
 
         // Remote APIS
         this.bind('api.user').to(options.apis.userApi);
@@ -56,6 +56,11 @@ export class CloudFoundryMonitorApplication extends Application {
 
         // Kubernetes
         this.bind('kubernetes.client').to(new Client1_10({config: config.getInCluster()}));
+
+        // Services
+        this.bind('services.cfController').toClass(CfControllerService);
+        this.bind('services.cfAuth').toClass(CfAuthService);
+        this.bind('services.auth').toClass(AuthService);
     }
 
 }

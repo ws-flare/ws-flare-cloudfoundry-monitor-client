@@ -14,6 +14,7 @@ export interface Container {
 }
 
 export const apis = {
+    cfApi: 'http://cf.com',
     userApi: 'http://user.com',
     projectsApi: 'http://projects.com',
     jobsApi: 'http://jobs.com'

@@ -3,7 +3,8 @@
   "extends": "@loopback/build/config/tsconfig.common.json",
   "compilerOptions": {
     "rootDir": "src",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true
   },
   "include": [
     "src"
