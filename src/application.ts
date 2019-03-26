@@ -6,6 +6,9 @@ import { createLogger, transports } from 'winston';
 import { CfControllerService } from './services/cloud-foundry/cf-controller.service';
 import { AuthService } from './services/auth.service';
 import { CfAuthService } from './services/cloud-foundry/cf-auth.service';
+import { CfOrgsService } from './services/cloud-foundry/cf-orgs.service';
+import { CfSpacesService } from './services/cloud-foundry/cf-spaces.service';
+import { MonitorService } from './services/monitor.service';
 
 export class CloudFoundryMonitorApplication extends Application {
 
@@ -32,6 +35,8 @@ export class CloudFoundryMonitorApplication extends Application {
         this.bind('cf.api').to(options.cf.api);
         this.bind('cf.user').to(options.cf.user);
         this.bind('cf.pass').to(options.cf.pass);
+        this.bind('cf.org').to(options.cf.org);
+        this.bind('cf.space').to(options.cf.space);
 
         // Remote APIS
         this.bind('api.user').to(options.apis.userApi);
@@ -60,7 +65,10 @@ export class CloudFoundryMonitorApplication extends Application {
         // Services
         this.bind('services.cfController').toClass(CfControllerService);
         this.bind('services.cfAuth').toClass(CfAuthService);
+        this.bind('services.cfOrgs').toClass(CfOrgsService);
+        this.bind('services.cfSpaces').toClass(CfSpacesService);
         this.bind('services.auth').toClass(AuthService);
+        this.bind('services.monitor').toClass(MonitorService);
     }
 
 }

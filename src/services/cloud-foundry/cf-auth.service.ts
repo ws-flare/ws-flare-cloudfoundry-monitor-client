@@ -1,5 +1,6 @@
 import { inject } from '@loopback/core';
 import { post, Response } from 'web-request';
+import { Token } from '../../models/token.model';
 
 export class CfAuthService {
 
@@ -9,8 +10,8 @@ export class CfAuthService {
     @inject('cf.pass')
     private cfPass: string;
 
-    async login(authorization_endpoint: string): Promise<Response<string>> {
-        return await post(`${authorization_endpoint}/oauth/token`, {
+    async login(authorization_endpoint: string): Promise<Token> {
+        const token = await post(`${authorization_endpoint}/oauth/token`, {
             headers: {
                 Authorization: 'Basic Y2Y6',
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -25,5 +26,7 @@ export class CfAuthService {
                 password: this.cfPass
             }
         });
+
+        return token.content as any;
     }
 }

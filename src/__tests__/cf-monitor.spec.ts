@@ -18,6 +18,9 @@ describe('CF Monitor', () => {
     let nodeReadyChannel: Channel;
     let cfControllerInterceptor: any;
     let cfLoginInterceptor: any;
+    let cfOrgsOneInterceptor: any;
+    let cfOrgsTwoInterceptor: any;
+    let cfSpacesInterceptor: any;
     let wsServer: WebSocket.Server;
 
     beforeEach(async () => {
@@ -32,6 +35,39 @@ describe('CF Monitor', () => {
                 username: 'user1',
                 password: 'pass1'
             })
+            .reply(200, {
+                token_type: 'Bearer',
+                access_token: 'my-super-token'
+            });
+
+        cfOrgsOneInterceptor = nock('http://cf.com')
+            .intercept('/v2/organizations?page=1', 'GET')
+            .reply(200, {
+                total_pages: 10,
+                resources: [
+                    {
+                        entity: {
+                            name: 'unknown'
+                        }
+                    }
+                ]
+            });
+
+        cfOrgsTwoInterceptor = nock('http://cf.com')
+            .intercept('/v2/organizations?page=2', 'GET')
+            .reply(200, {
+                total_pages: 10,
+                resources: [
+                    {
+                        entity: {
+                            name: 'org1'
+                        }
+                    }
+                ]
+            });
+
+        cfSpacesInterceptor = nock('http://cf.com')
+            .intercept('/oauth/token', 'POST')
             .reply(200, 'token-abc');
 
         wsServer = getWsServer();
@@ -70,5 +106,7 @@ describe('CF Monitor', () => {
 
         expect(cfControllerInterceptor.isDone()).to.eql(true);
         expect(cfLoginInterceptor.isDone()).to.eql(true);
+        expect(cfOrgsOneInterceptor.isDone()).to.eql(true);
+        expect(cfOrgsTwoInterceptor.isDone()).to.eql(true);
     });
 });

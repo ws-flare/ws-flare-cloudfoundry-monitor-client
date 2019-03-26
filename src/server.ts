@@ -3,6 +3,7 @@ import { Context, inject } from '@loopback/context';
 import { Connection } from 'amqplib';
 import { Logger } from 'winston';
 import { AuthService } from './services/auth.service';
+import { MonitorService } from './services/monitor.service';
 
 export class Server extends Context implements Server {
     private _listening: boolean = false;
@@ -25,6 +26,9 @@ export class Server extends Context implements Server {
     @inject('services.auth')
     private authService: AuthService;
 
+    @inject('services.monitor')
+    private monitorService: MonitorService;
+
     constructor(@inject(CoreBindings.APPLICATION_INSTANCE) public app?: Application) {
         super(app);
     }
@@ -46,6 +50,9 @@ export class Server extends Context implements Server {
 
         await createJobChannel.consume(qok.queue, async () => {
             const token = await this.authService.login();
+
+            await this.monitorService.monitor(token);
+
         }, {noAck: true});
     }
 
