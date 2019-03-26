@@ -20,7 +20,8 @@ describe('CF Monitor', () => {
     let cfLoginInterceptor: any;
     let cfOrgsOneInterceptor: any;
     let cfOrgsTwoInterceptor: any;
-    let cfSpacesInterceptor: any;
+    let cfSpacesOneInterceptor: any;
+    let cfSpacesTwoInterceptor: any;
     let wsServer: WebSocket.Server;
 
     beforeEach(async () => {
@@ -59,6 +60,9 @@ describe('CF Monitor', () => {
                 total_pages: 10,
                 resources: [
                     {
+                        metadata: {
+                            guid: 'org1-guid'
+                        },
                         entity: {
                             name: 'org1'
                         }
@@ -66,9 +70,34 @@ describe('CF Monitor', () => {
                 ]
             });
 
-        cfSpacesInterceptor = nock('http://cf.com')
-            .intercept('/oauth/token', 'POST')
-            .reply(200, 'token-abc');
+        cfSpacesOneInterceptor = nock('http://cf.com')
+            .intercept(`/v2/organizations/org1-guid/spaces?page=1`, 'GET')
+            .reply(200, {
+                total_pages: 10,
+                resources: [
+                    {
+                        entity: {
+                            name: 'unknown'
+                        }
+                    }
+                ]
+            });
+
+        cfSpacesTwoInterceptor = nock('http://cf.com')
+            .intercept(`/v2/organizations/org1-guid/spaces?page=2`, 'GET')
+            .reply(200, {
+                total_pages: 10,
+                resources: [
+                    {
+                        metadata: {
+                            guid: 'space1-guid'
+                        },
+                        entity: {
+                            name: 'space1'
+                        }
+                    }
+                ]
+            });
 
         wsServer = getWsServer();
 
@@ -108,5 +137,7 @@ describe('CF Monitor', () => {
         expect(cfLoginInterceptor.isDone()).to.eql(true);
         expect(cfOrgsOneInterceptor.isDone()).to.eql(true);
         expect(cfOrgsTwoInterceptor.isDone()).to.eql(true);
+        expect(cfSpacesOneInterceptor.isDone()).to.eql(true);
+        expect(cfSpacesTwoInterceptor.isDone()).to.eql(true);
     });
 });
