@@ -42,7 +42,7 @@ export class CfSpacesService {
                 spaces = await this.getSpaces(token, org.metadata.guid, i);
             }
 
-            reject(new Error('Unable to find organization'));
+            reject(new Error('Unable to find space'));
         });
     }
 }

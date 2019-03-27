@@ -22,6 +22,8 @@ describe('CF Monitor', () => {
     let cfOrgsTwoInterceptor: any;
     let cfSpacesOneInterceptor: any;
     let cfSpacesTwoInterceptor: any;
+    let cfAppsOneInterceptor: any;
+    let cfAppsTwoInterceptor: any;
     let wsServer: WebSocket.Server;
 
     beforeEach(async () => {
@@ -99,6 +101,54 @@ describe('CF Monitor', () => {
                 ]
             });
 
+        cfAppsOneInterceptor = nock('http://cf.com')
+            .intercept('/v2/spaces/space1-guid/apps?page=1', 'GET')
+            .reply(200, {
+                total_pages: 10,
+                resources: [
+                    {
+                        metadata: {
+                            guid: 'app1-guid'
+                        },
+                        entity: {
+                            name: 'app1'
+                        }
+                    },
+                    {
+                        metadata: {
+                            guid: 'app2-guid'
+                        },
+                        entity: {
+                            name: 'app2'
+                        }
+                    }
+                ]
+            });
+
+        cfAppsTwoInterceptor = nock('http://cf.com')
+            .intercept('/v2/spaces/space1-guid/apps?page=2', 'GET')
+            .reply(200, {
+                total_pages: 10,
+                resources: [
+                    {
+                        metadata: {
+                            guid: 'app3-guid'
+                        },
+                        entity: {
+                            name: 'app3'
+                        }
+                    },
+                    {
+                        metadata: {
+                            guid: 'app3-guid'
+                        },
+                        entity: {
+                            name: 'app4'
+                        }
+                    }
+                ]
+            });
+
         wsServer = getWsServer();
 
         ({container, port} = await startMqContainer());
@@ -133,11 +183,20 @@ describe('CF Monitor', () => {
 
         await new Promise(resolve => setTimeout(() => resolve(), 2000));
 
+        // Auth
         expect(cfControllerInterceptor.isDone()).to.eql(true);
         expect(cfLoginInterceptor.isDone()).to.eql(true);
+
+        // Organizations
         expect(cfOrgsOneInterceptor.isDone()).to.eql(true);
         expect(cfOrgsTwoInterceptor.isDone()).to.eql(true);
+
+        // Spaces
         expect(cfSpacesOneInterceptor.isDone()).to.eql(true);
         expect(cfSpacesTwoInterceptor.isDone()).to.eql(true);
+
+        // Apps
+        expect(cfAppsOneInterceptor.isDone()).to.eql(true);
+        expect(cfAppsTwoInterceptor.isDone()).to.eql(true);
     });
 });
