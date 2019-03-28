@@ -59,7 +59,7 @@ export class CloudFoundryMonitorApplication extends Application {
 
         // Queues
         this.bind('queue.job.start').to('job.start');
-        this.bind('queue.node.ready').to(`node.ready.${options.config.nodeId}`);
+        this.bind('queue.cfMonitor.ready').to(`cfMonitor.ready.${options.config.cfMonitorId}`);
 
         // Kubernetes
         this.bind('kubernetes.client').to(new Client1_10({config: config.getInCluster()}));

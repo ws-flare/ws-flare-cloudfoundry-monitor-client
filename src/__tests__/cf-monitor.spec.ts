@@ -9,13 +9,13 @@ import { main } from '..';
 describe('CF Monitor', () => {
 
     const startTestQueue = 'job.start.job1';
-    const nodeReadyQueue = 'node.ready.node1';
+    const cfMonitorReadyQueue = 'cfMonitor.ready.cf-monitor-1';
 
     let app: CloudFoundryMonitorApplication;
     let container: Container;
     let port: number;
     let startTestChannel: Channel;
-    let nodeReadyChannel: Channel;
+    let cfMonitorReadyChannel: Channel;
     let cfControllerInterceptor: any;
     let cfLoginInterceptor: any;
     let cfOrgsOneInterceptor: any;
@@ -159,9 +159,9 @@ describe('CF Monitor', () => {
 
         const conn = await getAMQPConn(port);
         startTestChannel = await conn.createChannel();
-        nodeReadyChannel = await conn.createChannel();
+        cfMonitorReadyChannel = await conn.createChannel();
 
-        await nodeReadyChannel.assertQueue(nodeReadyQueue);
+        await cfMonitorReadyChannel.assertQueue(cfMonitorReadyQueue);
 
         await startTestChannel.assertExchange(startTestQueue, 'fanout', {durable: false});
     });
@@ -177,6 +177,12 @@ describe('CF Monitor', () => {
     });
 
     it('should monitor cloud foundry', async () => {
+        let cfMonitorReady = false;
+
+        await cfMonitorReadyChannel.consume(cfMonitorReadyQueue, () => {
+            cfMonitorReady = true;
+        }, {noAck: true});
+
         await new Promise(resolve => setTimeout(() => resolve(), 2000));
 
         await startTestChannel.publish(startTestQueue, '', new Buffer((JSON.stringify({start: true}))));
@@ -198,5 +204,7 @@ describe('CF Monitor', () => {
         // Apps
         expect(cfAppsOneInterceptor.isDone()).to.eql(true);
         expect(cfAppsTwoInterceptor.isDone()).to.eql(true);
+
+        expect(cfMonitorReady).to.eql(true);
     });
 });

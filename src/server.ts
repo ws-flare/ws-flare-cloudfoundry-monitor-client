@@ -20,9 +20,6 @@ export class Server extends Context implements Server {
     @inject('config.job.id')
     private jobId: string;
 
-    @inject('queue.node.ready')
-    private nodeReadyQueue: string;
-
     @inject('services.auth')
     private authService: AuthService;
 
