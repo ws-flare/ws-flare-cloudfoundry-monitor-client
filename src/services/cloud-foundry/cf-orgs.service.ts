@@ -4,8 +4,12 @@ import { json } from 'web-request';
 import { Org } from '../../models/org.model';
 import { Page } from '../../models/page.model';
 import { find } from 'lodash';
+import { Logger } from 'winston';
 
 export class CfOrgsService {
+
+    @inject('logger')
+    private logger: Logger;
 
     @inject('cf.api')
     private cfApi: string;
@@ -31,8 +35,14 @@ export class CfOrgsService {
         return new Promise(async (resolve, reject) => {
             let orgs = await this.getOrgs(token);
 
+            this.logger.info('Got organizations');
+            this.logger.info(orgs);
+
             for (let i = 2; i < orgs.total_pages; i++) {
                 const org = find(orgs.resources, ['entity.name', this.cfOrg]);
+
+                this.logger.info('Got organizations');
+                this.logger.info(orgs);
 
                 if (org) {
                     return resolve(org);
