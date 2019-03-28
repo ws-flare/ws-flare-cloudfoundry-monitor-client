@@ -45,10 +45,15 @@ export class Server extends Context implements Server {
 
         await createJobChannel.bindQueue(qok.queue, queue, '');
 
-        await createJobChannel.consume(qok.queue, async () => {
-            const token = await this.authService.login();
+        this.logger.info('Logging in');
+        const token = await this.authService.login();
 
-            await this.monitorService.monitor(token);
+        this.logger.info('Logged in');
+        this.logger.info(token);
+
+        await this.monitorService.monitor(token);
+
+        await createJobChannel.consume(qok.queue, async () => {
 
         }, {noAck: true});
     }
