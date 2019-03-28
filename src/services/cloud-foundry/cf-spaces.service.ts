@@ -32,7 +32,7 @@ export class CfSpacesService {
         return new Promise(async (resolve, reject) => {
             let spaces = await this.getSpaces(token, org.metadata.guid);
 
-            for (let i = 2; i < spaces.total_pages; i++) {
+            for (let i = 1; i <= spaces.total_pages; i++) {
                 const space = find(spaces.resources, ['entity.name', this.cfSpace]);
 
                 if (space) {

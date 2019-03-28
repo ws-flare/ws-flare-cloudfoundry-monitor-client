@@ -32,7 +32,7 @@ export class CfAppsService {
             let apps = await this.getApps(token, space.metadata.guid);
             let foundApps: App[] = [];
 
-            for (let i = 2; i < apps.total_pages; i++) {
+            for (let i = 1; i <= apps.total_pages; i++) {
 
                 this.cfApps.forEach((app) => {
                     const foundApp: any = find(apps.resources, ['entity.name', app]);

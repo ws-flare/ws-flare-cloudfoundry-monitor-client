@@ -57,7 +57,7 @@ describe('CF Monitor', () => {
             });
 
         cfOrgsTwoInterceptor = nock('http://cf.com')
-            .intercept('/v2/organizations?page=2', 'GET')
+            .intercept('/v2/organizations?page=1', 'GET')
             .reply(200, {
                 total_pages: 10,
                 resources: [
@@ -86,7 +86,7 @@ describe('CF Monitor', () => {
             });
 
         cfSpacesTwoInterceptor = nock('http://cf.com')
-            .intercept(`/v2/organizations/org1-guid/spaces?page=2`, 'GET')
+            .intercept(`/v2/organizations/org1-guid/spaces?page=1`, 'GET')
             .reply(200, {
                 total_pages: 10,
                 resources: [
@@ -126,7 +126,7 @@ describe('CF Monitor', () => {
             });
 
         cfAppsTwoInterceptor = nock('http://cf.com')
-            .intercept('/v2/spaces/space1-guid/apps?page=2', 'GET')
+            .intercept('/v2/spaces/space1-guid/apps?page=1', 'GET')
             .reply(200, {
                 total_pages: 10,
                 resources: [

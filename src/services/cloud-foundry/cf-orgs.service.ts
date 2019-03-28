@@ -38,7 +38,7 @@ export class CfOrgsService {
             this.logger.info('Got organizations');
             this.logger.info(orgs);
 
-            for (let i = 2; i < orgs.total_pages; i++) {
+            for (let i = 1; i <= orgs.total_pages; i++) {
                 const org = find(orgs.resources, ['entity.name', this.cfOrg]);
 
                 this.logger.info('Got organizations');
