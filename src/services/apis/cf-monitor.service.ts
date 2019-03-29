@@ -2,8 +2,12 @@ import { inject } from '@loopback/core';
 import { post } from 'superagent';
 import { AppStat } from '../../models/app-stat.model';
 import { App } from '../../models/app.model';
+import { Logger } from 'winston';
 
 export class CfMonitorService {
+
+    @inject('logger')
+    private logger: Logger;
 
     @inject('api.monitor')
     private monitorApi: string;
@@ -12,6 +16,11 @@ export class CfMonitorService {
     private jobId: string;
 
     async createUsage(app: App, appStat: AppStat, instance: string): Promise<any> {
+        this.logger.info('Logging usage');
+        this.logger.info(app);
+        this.logger.info(appStat);
+        this.logger.info(`Instance: ${instance}`);
+
         return await post(`${this.monitorApi}/usages`).send({
             jobId: this.jobId,
             appId: app.metadata.guid,

@@ -30,6 +30,7 @@ export class CfStatsService {
 
     async monitor(token: Token, apps: App[]) {
         forever(next => {
+            this.logger.info('In forever and monitoring');
             this.monitorInParallel(token, apps)
                 .then(() => next())
                 .catch(err => next(err))
