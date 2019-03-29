@@ -4,6 +4,7 @@ import { Connection } from 'amqplib';
 import { Logger } from 'winston';
 import { AuthService } from './services/auth.service';
 import { MonitorService } from './services/monitor.service';
+import { CfStatsService } from './services/cloud-foundry/cf-stats.service';
 
 export class Server extends Context implements Server {
     private _listening: boolean = false;
@@ -25,6 +26,9 @@ export class Server extends Context implements Server {
 
     @inject('services.monitor')
     private monitorService: MonitorService;
+
+    @inject('services.cfAppStats')
+    private cfStatsService: CfStatsService;
 
     constructor(@inject(CoreBindings.APPLICATION_INSTANCE) public app?: Application) {
         super(app);
@@ -51,10 +55,11 @@ export class Server extends Context implements Server {
         this.logger.info('Logged in');
         this.logger.info(token);
 
-        await this.monitorService.monitor(token);
+        const apps = await this.monitorService.monitor(token);
 
         await createJobChannel.consume(qok.queue, async () => {
-
+            this.logger.info('Monitoring has started');
+            await this.cfStatsService.monitor(token, apps);
         }, {noAck: true});
     }
 

@@ -5,6 +5,7 @@ import { CfSpacesService } from './cloud-foundry/cf-spaces.service';
 import { CfAppsService } from './cloud-foundry/cf-apps.service';
 import { Logger } from 'winston';
 import { Connection } from 'amqplib';
+import { App } from '../models/app.model';
 
 export class MonitorService {
 
@@ -26,7 +27,7 @@ export class MonitorService {
     @inject('queue.cfMonitor.ready')
     private cfMonitorReadyQueue: string;
 
-    async monitor(token: Token) {
+    async monitor(token: Token): Promise<App[]> {
         const cfMonitorReadyChannel = await this.amqpConn.createChannel();
 
         await cfMonitorReadyChannel.assertQueue(this.cfMonitorReadyQueue);
@@ -45,5 +46,7 @@ export class MonitorService {
 
         // Ready to start monitoring
         await cfMonitorReadyChannel.sendToQueue(this.cfMonitorReadyQueue, new Buffer((JSON.stringify({ready: true}))));
+
+        return apps;
     }
 }

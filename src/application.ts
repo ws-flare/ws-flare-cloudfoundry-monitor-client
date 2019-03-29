@@ -10,6 +10,8 @@ import { CfOrgsService } from './services/cloud-foundry/cf-orgs.service';
 import { CfSpacesService } from './services/cloud-foundry/cf-spaces.service';
 import { MonitorService } from './services/monitor.service';
 import { CfAppsService } from './services/cloud-foundry/cf-apps.service';
+import { CfStatsService } from './services/cloud-foundry/cf-stats.service';
+import { CfMonitorService } from './services/apis/cf-monitor.service';
 
 export class CloudFoundryMonitorApplication extends Application {
 
@@ -44,6 +46,7 @@ export class CloudFoundryMonitorApplication extends Application {
         this.bind('api.user').to(options.apis.userApi);
         this.bind('api.projects').to(options.apis.projectsApi);
         this.bind('api.jobs').to(options.apis.jobsApi);
+        this.bind('api.monitor').to(options.apis.monitorApi);
 
         // AMQP
         this.bind('amqp.url').to(options.amqp.url);
@@ -70,8 +73,10 @@ export class CloudFoundryMonitorApplication extends Application {
         this.bind('services.cfOrgs').toClass(CfOrgsService);
         this.bind('services.cfSpaces').toClass(CfSpacesService);
         this.bind('services.cfApps').toClass(CfAppsService);
+        this.bind('services.cfAppStats').toClass(CfStatsService);
         this.bind('services.auth').toClass(AuthService);
         this.bind('services.monitor').toClass(MonitorService);
+        this.bind('services.cfMonitor').toClass(CfMonitorService);
     }
 
 }

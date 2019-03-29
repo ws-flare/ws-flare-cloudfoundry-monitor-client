@@ -1,7 +1,7 @@
 import { ApplicationConfig } from '@loopback/core';
 import { CloudFoundryMonitorApplication } from './application';
 
-const {PORT, USER_API, PROJECTS_API, JOBS_API, AMQP_URL, AMQP_PORT, AMQP_USER, AMQP_PWD, JOB_ID, CF_API, CF_USER, CF_PASS, CF_ORG, CF_SPACE, CF_APPS, CF_MONITOR_ID} = process.env;
+const {PORT, USER_API, PROJECTS_API, JOBS_API, MONITOR_API, AMQP_URL, AMQP_PORT, AMQP_USER, AMQP_PWD, JOB_ID, CF_API, CF_USER, CF_PASS, CF_ORG, CF_SPACE, CF_APPS, CF_MONITOR_ID} = process.env;
 
 export async function main(options: ApplicationConfig = {}): Promise<CloudFoundryMonitorApplication> {
     options.port = options.port || PORT;
@@ -20,7 +20,8 @@ export async function main(options: ApplicationConfig = {}): Promise<CloudFoundr
     options.apis = {
         userApi: USER_API,
         projectsApi: PROJECTS_API,
-        jobsApi: JOBS_API
+        jobsApi: JOBS_API,
+        monitorApi: MONITOR_API
     };
     options.amqp = {
         url: AMQP_URL,

@@ -24,6 +24,10 @@ describe('CF Monitor', () => {
     let cfSpacesTwoInterceptor: any;
     let cfAppsOneInterceptor: any;
     let cfAppsTwoInterceptor: any;
+    let cfStatsOneInterceptor: any;
+    let cfStatsTwoInterceptor: any;
+    let cfStatsThreeInterceptor: any;
+    let cfMonitorInterceptor: any;
     let wsServer: WebSocket.Server;
 
     beforeEach(async () => {
@@ -149,6 +153,91 @@ describe('CF Monitor', () => {
                 ]
             });
 
+        cfStatsOneInterceptor = nock('http://cf.com')
+            .intercept('/v2/apps/app1-guid/stats', 'GET')
+            .reply(200, {
+                "0": {
+                    "state": "RUNNING",
+                    "isolation_segment": "iso-seg-name",
+                    "stats": {
+                        "usage": {
+                            "disk": 66392064,
+                            "mem": 29880320,
+                            "cpu": 0.13511219703079957,
+                            "time": "2014-06-19 22:37:58 +0000"
+                        },
+                        "name": "app_name",
+                        "uris": [
+                            "app_name.example.com"
+                        ],
+                        "host": "10.0.0.1",
+                        "port": 61035,
+                        "uptime": 65007,
+                        "mem_quota": 536870912,
+                        "disk_quota": 1073741824,
+                        "fds_quota": 16384
+                    }
+                }
+            });
+
+        cfStatsTwoInterceptor = nock('http://cf.com')
+            .intercept('/v2/apps/app2-guid/stats', 'GET')
+            .reply(200, {
+                "0": {
+                    "state": "RUNNING",
+                    "isolation_segment": "iso-seg-name",
+                    "stats": {
+                        "usage": {
+                            "disk": 66392064,
+                            "mem": 29880320,
+                            "cpu": 0.13511219703079957,
+                            "time": "2014-06-19 22:37:58 +0000"
+                        },
+                        "name": "app_name",
+                        "uris": [
+                            "app_name.example.com"
+                        ],
+                        "host": "10.0.0.1",
+                        "port": 61035,
+                        "uptime": 65007,
+                        "mem_quota": 536870912,
+                        "disk_quota": 1073741824,
+                        "fds_quota": 16384
+                    }
+                }
+            });
+
+        cfStatsThreeInterceptor = nock('http://cf.com')
+            .intercept('/v2/apps/app3-guid/stats', 'GET')
+            .reply(200, {
+                "0": {
+                    "state": "RUNNING",
+                    "isolation_segment": "iso-seg-name",
+                    "stats": {
+                        "usage": {
+                            "disk": 66392064,
+                            "mem": 29880320,
+                            "cpu": 0.13511219703079957,
+                            "time": "2014-06-19 22:37:58 +0000"
+                        },
+                        "name": "app_name",
+                        "uris": [
+                            "app_name.example.com"
+                        ],
+                        "host": "10.0.0.1",
+                        "port": 61035,
+                        "uptime": 65007,
+                        "mem_quota": 536870912,
+                        "disk_quota": 1073741824,
+                        "fds_quota": 16384
+                    }
+                }
+            });
+
+        cfMonitorInterceptor = nock('http://monitor.com')
+            .intercept('/usages', 'POST')
+            .reply(200, {});
+
         wsServer = getWsServer();
 
         ({container, port} = await startMqContainer());
@@ -204,6 +293,14 @@ describe('CF Monitor', () => {
         // Apps
         expect(cfAppsOneInterceptor.isDone()).to.eql(true);
         expect(cfAppsTwoInterceptor.isDone()).to.eql(true);
+
+        // Stats
+        expect(cfStatsOneInterceptor.isDone()).to.eql(true);
+        expect(cfStatsTwoInterceptor.isDone()).to.eql(true);
+        expect(cfStatsThreeInterceptor.isDone()).to.eql(true);
+
+        // Monitor API
+        expect(cfMonitorInterceptor.isDone()).to.eql(true);
 
         expect(cfMonitorReady).to.eql(true);
     });
