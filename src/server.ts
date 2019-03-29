@@ -5,6 +5,7 @@ import { Logger } from 'winston';
 import { AuthService } from './services/auth.service';
 import { MonitorService } from './services/monitor.service';
 import { CfStatsService } from './services/cloud-foundry/cf-stats.service';
+import { KubernetesService } from './services/KubernetesService';
 
 export class Server extends Context implements Server {
     private _listening: boolean = false;
@@ -18,6 +19,9 @@ export class Server extends Context implements Server {
     @inject('queue.job.start')
     private startTestQueue: string;
 
+    @inject('queue.job.complete')
+    private jobCompleteQueue: string;
+
     @inject('config.job.id')
     private jobId: string;
 
@@ -30,6 +34,9 @@ export class Server extends Context implements Server {
     @inject('services.cfAppStats')
     private cfStatsService: CfStatsService;
 
+    @inject('services.kubernetes')
+    private kubernetesService: KubernetesService;
+
     constructor(@inject(CoreBindings.APPLICATION_INSTANCE) public app?: Application) {
         super(app);
     }
@@ -39,15 +46,17 @@ export class Server extends Context implements Server {
     }
 
     async start(): Promise<void> {
-        const createJobChannel = await this.amqpConn.createChannel();
+        const startTestChannel = await this.amqpConn.createChannel();
+        const jobCompleteChannel = await this.amqpConn.createChannel();
 
-        const queue = `${this.startTestQueue}.${this.jobId}`;
+        const startTestQok: any = await startTestChannel.assertExchange(this.startTestQueue, 'fanout', {durable: false});
+        const jobCompleteQok: any = await jobCompleteChannel.assertExchange(this.jobCompleteQueue, 'fanout', {durable: false});
 
-        const qok: any = await createJobChannel.assertExchange(queue, 'fanout', {durable: false});
+        await startTestChannel.assertQueue('', {exclusive: true});
+        await jobCompleteChannel.assertQueue('', {exclusive: true});
 
-        await createJobChannel.assertQueue('', {exclusive: true});
-
-        await createJobChannel.bindQueue(qok.queue, queue, '');
+        await startTestChannel.bindQueue(startTestQok.queue, this.startTestQueue, '');
+        await jobCompleteChannel.bindQueue(jobCompleteQok.queue, this.jobCompleteQueue, '');
 
         this.logger.info('Logging in');
         const token = await this.authService.login();
@@ -57,9 +66,16 @@ export class Server extends Context implements Server {
 
         const apps = await this.monitorService.monitor(token);
 
-        await createJobChannel.consume(qok.queue, async () => {
+        // Start Monitoring
+        startTestChannel.consume(startTestQok.queue, async () => {
             this.logger.info('Monitoring has started');
             await this.cfStatsService.monitor(token, apps);
+        }, {noAck: true});
+
+        // Shutdown pod
+        jobCompleteChannel.consume(jobCompleteQok.queue, async () => {
+            this.logger.info('Shutting down self');
+            await this.kubernetesService.shutdown();
         }, {noAck: true});
     }
 

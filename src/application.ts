@@ -12,6 +12,7 @@ import { MonitorService } from './services/monitor.service';
 import { CfAppsService } from './services/cloud-foundry/cf-apps.service';
 import { CfStatsService } from './services/cloud-foundry/cf-stats.service';
 import { CfMonitorService } from './services/apis/cf-monitor.service';
+import { KubernetesService } from './services/KubernetesService';
 
 export class CloudFoundryMonitorApplication extends Application {
 
@@ -33,6 +34,7 @@ export class CloudFoundryMonitorApplication extends Application {
 
         // Config
         this.bind('config.job.id').to(options.config.jobId);
+        this.bind('config.pod.name').to(options.config.podName);
 
         // CF
         this.bind('cf.api').to(options.cf.api);
@@ -61,7 +63,8 @@ export class CloudFoundryMonitorApplication extends Application {
         }));
 
         // Queues
-        this.bind('queue.job.start').to('job.start');
+        this.bind('queue.job.start').to(`job.start.${options.config.jobId}`);
+        this.bind('queue.job.complete').to(`job.complete.${options.config.jobId}`);
         this.bind('queue.cfMonitor.ready').to(`cfMonitor.ready.${options.config.cfMonitorId}`);
 
         // Kubernetes
@@ -77,6 +80,7 @@ export class CloudFoundryMonitorApplication extends Application {
         this.bind('services.auth').toClass(AuthService);
         this.bind('services.monitor').toClass(MonitorService);
         this.bind('services.cfMonitor').toClass(CfMonitorService);
+        this.bind('services.kubernetes').toClass(KubernetesService);
     }
 
 }
