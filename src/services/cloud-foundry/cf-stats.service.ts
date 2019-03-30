@@ -32,6 +32,7 @@ export class CfStatsService {
         forever(next => {
             this.logger.info('In forever and monitoring');
             this.monitorInParallel(token, apps)
+                .then(() => this.wait())
                 .then(() => next())
                 .catch(err => next(err))
         }, (err: Error) => {
@@ -58,5 +59,9 @@ export class CfStatsService {
                     .catch((err) => callback(err));
             }, (err) => err ? reject(err) : resolve());
         });
+    }
+
+    async wait() {
+        return new Promise(resolve => setTimeout(() => resolve(), 500));
     }
 }
