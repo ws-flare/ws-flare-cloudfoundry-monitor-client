@@ -1,5 +1,5 @@
 import { Channel } from 'amqplib';
-import { apis, Container, getAMQPConn, getWsServer, setupK8sConfig, startMqContainer } from './test-helpers';
+import { apis, Container, getAMQPConn, getWsServer, restoreFS, setupK8sConfig, startMqContainer } from './test-helpers';
 import * as nock from 'nock';
 import { expect } from 'chai';
 import * as WebSocket from 'ws';
@@ -263,6 +263,7 @@ describe('CF Monitor', () => {
         nock.cleanAll();
         nock.restore();
         nock.activate();
+        restoreFS();
     });
 
     it('should monitor cloud foundry', async () => {

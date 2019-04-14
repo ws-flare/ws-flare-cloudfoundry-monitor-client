@@ -1,5 +1,5 @@
 import { Channel } from 'amqplib';
-import { apis, Container, getAMQPConn, setupK8sConfig, startMqContainer } from './test-helpers';
+import { apis, Container, getAMQPConn, restoreFS, setupK8sConfig, startMqContainer } from './test-helpers';
 import * as nock from 'nock';
 import { expect } from 'chai';
 import * as WebSocket from 'ws';
@@ -176,6 +176,7 @@ describe('Shutdown', () => {
         nock.cleanAll();
         nock.restore();
         nock.activate();
+        restoreFS();
     });
 
     it('should shutdown when job is completed', async () => {
