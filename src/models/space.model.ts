@@ -1,3 +1,6 @@
+/**
+ * Defines the attributes of a Space on Cloud Foundry
+ */
 export interface Space {
     metadata: {
         guid: string;

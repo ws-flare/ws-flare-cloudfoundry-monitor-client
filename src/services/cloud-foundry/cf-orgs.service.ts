@@ -6,6 +6,9 @@ import { Page } from '../../models/page.model';
 import { find } from 'lodash';
 import { Logger } from 'winston';
 
+/**
+ * Service for interacting with Cloud Foundry Organizations endpoint
+ */
 export class CfOrgsService {
 
     @inject('logger')
@@ -17,6 +20,12 @@ export class CfOrgsService {
     @inject('cf.org')
     private cfOrg: string;
 
+    /**
+     * Get a list of organizations from Cloud Foundry
+     *
+     * @param token - Access token
+     * @param page - Page number for pagination
+     */
     async getOrgs(token: Token, page: number = 1): Promise<Page<Org>> {
         return json(`${this.cfApi}/v2/organizations`, {
             headers: {
@@ -31,6 +40,11 @@ export class CfOrgsService {
         });
     }
 
+    /**
+     * Finds the requested organization id on cloud foundry
+     *
+     * @param token - Access token
+     */
     async findOrg(token: Token): Promise<Org> {
         return new Promise(async (resolve, reject) => {
             let orgs = await this.getOrgs(token);

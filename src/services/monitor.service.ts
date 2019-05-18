@@ -7,6 +7,9 @@ import { Logger } from 'winston';
 import { Connection } from 'amqplib';
 import { App } from '../models/app.model';
 
+/**
+ * Service to start monitoring Cloud Foundry applications
+ */
 export class MonitorService {
 
     @inject('logger')
@@ -27,6 +30,11 @@ export class MonitorService {
     @inject('queue.cfMonitor.ready')
     private cfMonitorReadyQueue: string;
 
+    /**
+     * Begin monitoring applications on Cloud Foundry
+     *
+     * @param token - Access token
+     */
     async monitor(token: Token): Promise<App[]> {
         const cfMonitorReadyChannel = await this.amqpConn.createChannel();
 

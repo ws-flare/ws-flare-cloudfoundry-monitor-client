@@ -1,8 +1,14 @@
 import { ApplicationConfig } from '@loopback/core';
 import { CloudFoundryMonitorApplication } from './application';
 
+// Get necessary configuration from environment variables
 const {PORT, USER_API, PROJECTS_API, JOBS_API, MONITOR_API, AMQP_URL, AMQP_PORT, AMQP_USER, AMQP_PWD, JOB_ID, CF_API, CF_USER, CF_PASS, CF_ORG, CF_SPACE, CF_APPS, CF_MONITOR_ID, POD_NAME} = process.env;
 
+/**
+ * Main entry point for starting the service
+ *
+ * @param options - Server configurations
+ */
 export async function main(options: ApplicationConfig = {}): Promise<CloudFoundryMonitorApplication> {
     options.port = options.port || PORT;
     options.config = {

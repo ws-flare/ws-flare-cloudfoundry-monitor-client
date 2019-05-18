@@ -14,6 +14,9 @@ import { CfStatsService } from './services/cloud-foundry/cf-stats.service';
 import { CfMonitorService } from './services/apis/cf-monitor.service';
 import { KubernetesService } from './services/KubernetesService';
 
+/**
+ * Bootstraps the loopback service and sets up dependency injection
+ */
 export class CloudFoundryMonitorApplication extends Application {
 
     constructor(options: ApplicationConfig = {}) {

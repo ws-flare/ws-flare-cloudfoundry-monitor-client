@@ -1,3 +1,6 @@
+/**
+ * Defines the attributes of an organization on cloud foundry
+ */
 export interface Org {
     metadata: {
         guid: string;

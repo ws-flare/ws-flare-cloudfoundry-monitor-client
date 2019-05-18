@@ -1,3 +1,6 @@
+/**
+ * Defines the attributes of a an state on Cloud Foundry
+ */
 export interface AppStat {
     state: 'RUNNING' | 'CRASHED' | 'STOPPED';
     isolation_segment: string;

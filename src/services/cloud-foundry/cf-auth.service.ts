@@ -1,7 +1,10 @@
-import { inject } from '@loopback/core';
-import { post, Response } from 'web-request';
-import { Token } from '../../models/token.model';
+import {inject} from '@loopback/core';
+import {post} from 'web-request';
+import {Token} from '../../models/token.model';
 
+/**
+ * Service for authenticating with the Cloud Foundry API
+ */
 export class CfAuthService {
 
     @inject('cf.user')
@@ -10,6 +13,11 @@ export class CfAuthService {
     @inject('cf.pass')
     private cfPass: string;
 
+    /**
+     * Login to the Cloud Foundry API and get an access token to be used in future requests
+     *
+     * @param authorization_endpoint - The location of the authorization endpoint
+     */
     async login(authorization_endpoint: string): Promise<Token> {
         const token = await post(`${authorization_endpoint}/oauth/token`, {
             headers: {

@@ -1,11 +1,14 @@
-import { inject } from '@loopback/core';
-import { Page } from '../../models/page.model';
-import { Space } from '../../models/space.model';
-import { Token } from '../../models/token.model';
-import { json } from 'web-request';
-import { find } from 'lodash';
-import { Org } from '../../models/org.model';
+import {inject} from '@loopback/core';
+import {Page} from '../../models/page.model';
+import {Space} from '../../models/space.model';
+import {Token} from '../../models/token.model';
+import {json} from 'web-request';
+import {find} from 'lodash';
+import {Org} from '../../models/org.model';
 
+/**
+ * Service for interacting with the Cloud Foundry spaces API
+ */
 export class CfSpacesService {
 
     @inject('cf.api')
@@ -14,6 +17,13 @@ export class CfSpacesService {
     @inject('cf.space')
     private cfSpace: string;
 
+    /**
+     * Gets a list of spaces in an organization from Cloud Foundry
+     *
+     * @param token - Access token
+     * @param orgId - Organization id
+     * @param page - Page number for pagination
+     */
     async getSpaces(token: Token, orgId: string, page: number = 1): Promise<Page<Space>> {
         return json(`${this.cfApi}/v2/organizations/${orgId}/spaces`, {
             headers: {
@@ -28,6 +38,12 @@ export class CfSpacesService {
         });
     }
 
+    /**
+     * Finds the correct space within an organization
+     *
+     * @param token - Access token
+     * @param org - Organization
+     */
     async findSpace(token: Token, org: Org): Promise<Space> {
         return new Promise(async (resolve, reject) => {
             let spaces = await this.getSpaces(token, org.metadata.guid);

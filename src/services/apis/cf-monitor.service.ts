@@ -4,6 +4,9 @@ import { AppStat } from '../../models/app-stat.model';
 import { App } from '../../models/app.model';
 import { Logger } from 'winston';
 
+/**
+ * Services for communicating with ws-flare-cloud-foundry-monitor-api
+ */
 export class CfMonitorService {
 
     @inject('logger')
@@ -15,6 +18,13 @@ export class CfMonitorService {
     @inject('config.job.id')
     private jobId: string;
 
+    /**
+     * Create a new usage statistic for an app on Cloud Foundry
+     *
+     * @param app - The app
+     * @param appStat - The app statistics
+     * @param instance - The app instance number
+     */
     async createUsage(app: App, appStat: AppStat, instance: string): Promise<any> {
         this.logger.info('Logging usage');
         this.logger.info(app);

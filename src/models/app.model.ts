@@ -1,3 +1,6 @@
+/**
+ * Defines the attributes of the App model for applications running on Cloud Foundry
+ */
 export interface App {
     metadata: {
         guid: string;

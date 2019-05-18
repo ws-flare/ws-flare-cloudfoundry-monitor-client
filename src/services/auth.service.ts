@@ -4,6 +4,9 @@ import { CfAuthService } from './cloud-foundry/cf-auth.service';
 import { Logger } from 'winston';
 import { Token } from '../models/token.model';
 
+/**
+ * Service for handling login to Cloud Foundry API
+ */
 export class AuthService {
 
     @inject('logger')
@@ -15,6 +18,9 @@ export class AuthService {
     @inject('services.cfAuth')
     private cfAuth: CfAuthService;
 
+    /**
+     * Login to the Cloud Foundry API to get an access token
+     */
     async login(): Promise<Token> {
         const controller = await this.cfController.getControllerInfo();
 

@@ -7,6 +7,9 @@ import { each, forever, forEachOf } from 'async';
 import { Logger } from 'winston';
 import { CfMonitorService } from '../apis/cf-monitor.service';
 
+/**
+ * Service for getting monitor statistics from Cloud Foundry applications
+ */
 export class CfStatsService {
 
     @inject('logger')
@@ -18,6 +21,12 @@ export class CfStatsService {
     @inject('services.cfMonitor')
     private cfMonitorService: CfMonitorService;
 
+    /**
+     * Get application usage statistics on Cloud Foundry
+     *
+     * @param token - Access token
+     * @param appId - App id
+     */
     async getAppStats(token: Token, appId: string): Promise<{ [key: string]: AppStat }> {
         return await json(`${this.cfApi}/v2/apps/${appId}/stats`, {
             headers: {
@@ -28,6 +37,12 @@ export class CfStatsService {
         });
     }
 
+    /**
+     * Queries the app usage statistics every second until the test job has finished
+     *
+     * @param token - Access token
+     * @param apps - Apps to monitor
+     */
     async monitor(token: Token, apps: App[]) {
         forever(next => {
             this.logger.info('In forever and monitoring');
@@ -40,6 +55,12 @@ export class CfStatsService {
         });
     }
 
+    /**
+     * Monitors all applications in parallel
+     *
+     * @param token - Access token
+     * @param apps - Applications to monitor
+     */
     private monitorInParallel(token: Token, apps: App[]) {
         return new Promise((resolve, reject) => {
             each(apps, (app, callback) => {
@@ -51,6 +72,11 @@ export class CfStatsService {
         });
     }
 
+    /**
+     * Records the usage statistics of an application on Cloud Foundry in the ws-flare-cloud-foundry-monitor-api
+     * @param app
+     * @param stats
+     */
     private recordUsage(app: App, stats: { [key: string]: AppStat }) {
         return new Promise((resolve, reject) => {
             forEachOf(stats, (item, key, callback) => {
@@ -61,6 +87,9 @@ export class CfStatsService {
         });
     }
 
+    /**
+     * Wait for 1 second
+     */
     async wait() {
         return new Promise(resolve => setTimeout(() => resolve(), 1000));
     }

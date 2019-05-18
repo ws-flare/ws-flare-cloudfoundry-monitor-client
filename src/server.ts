@@ -7,6 +7,9 @@ import { MonitorService } from './services/monitor.service';
 import { CfStatsService } from './services/cloud-foundry/cf-stats.service';
 import { KubernetesService } from './services/KubernetesService';
 
+/**
+ * Starts the Cloud Foundry monitoring service
+ */
 export class Server extends Context implements Server {
     private _listening: boolean = false;
 
@@ -45,6 +48,9 @@ export class Server extends Context implements Server {
         return this._listening;
     }
 
+    /**
+     * Start the monitor
+     */
     async start(): Promise<void> {
         const startTestChannel = await this.amqpConn.createChannel();
         const jobCompleteChannel = await this.amqpConn.createChannel();

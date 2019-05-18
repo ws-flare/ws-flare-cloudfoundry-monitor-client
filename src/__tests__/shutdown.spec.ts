@@ -6,6 +6,9 @@ import * as WebSocket from 'ws';
 import { CloudFoundryMonitorApplication } from '../application';
 import { main } from '..';
 
+/**
+ * Tests to make sure the kubernetes pod shuts down correctly
+ */
 describe('Shutdown', () => {
 
     const jobCompleteQueue = 'job.complete.job1';

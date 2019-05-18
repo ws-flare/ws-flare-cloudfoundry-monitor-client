@@ -6,6 +6,9 @@ import * as WebSocket from 'ws';
 import { CloudFoundryMonitorApplication } from '../application';
 import { main } from '..';
 
+/**
+ * Tests for cloud foundry monitor
+ */
 describe('CF Monitor', () => {
 
     const startTestQueue = 'job.start.job1';

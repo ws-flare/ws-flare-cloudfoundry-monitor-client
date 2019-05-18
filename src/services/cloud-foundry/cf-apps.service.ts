@@ -6,6 +6,9 @@ import { Page } from '../../models/page.model';
 import { find } from 'lodash';
 import { App } from '../../models/app.model';
 
+/**
+ * Service for interacting with the apps api on Cloud Foundry
+ */
 export class CfAppsService {
 
     @inject('cf.api')
@@ -14,6 +17,13 @@ export class CfAppsService {
     @inject('cf.apps')
     private cfApps: string[];
 
+    /**
+     * Get a list of apps within a space
+     *
+     * @param token - Access token
+     * @param spaceId - Space id
+     * @param page - Page number for pagination
+     */
     async getApps(token: Token, spaceId: string, page: number = 1): Promise<Page<Space>> {
         return json(`${this.cfApi}/v2/spaces/${spaceId}/apps`, {
             headers: {
@@ -27,6 +37,12 @@ export class CfAppsService {
         });
     }
 
+    /**
+     * Finds the apps that the user wanted to monitor on Cloud Foundry
+     *
+     * @param token - Access token
+     * @param space - Space id
+     */
     async findApps(token: Token, space: Space): Promise<App[]> {
         return new Promise(async (resolve, reject) => {
             let apps = await this.getApps(token, space.metadata.guid);
